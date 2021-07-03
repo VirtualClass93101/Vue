@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title></title>
+	<script src="https://unpkg.com/vue/dist/vue.min.js"></script>
+	<script>
+	    document.addEventListener('DOMContentLoaded', function () {
+	    	var vm = new Vue({
+				el: '#app',
+				delimiters: ['${', '}'],
+				data: {
+					list: [
+				  			{ id: '1', name: 'a' },
+							{ id: '2', name: 'b' },
+						  	{ id: '3', name: 'c' }
+					],
+				},
+			});
+	    })
+	</script>
+</head>
+<body>
+	<div id="app">
+		<ul>
+    		<li v-for="(item in list">
+      			name:${ item.name }
+    		</li>
+  		</ul>
+	</div>
+</body>
+</html>
