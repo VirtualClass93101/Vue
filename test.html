@@ -49,27 +49,25 @@
 	    	}
 	  	},
 	  	mounted () {
-	    	// axios
-	     //  	.get('https://restcountries.eu/rest/v2/all')
-	     //  	.then(response => {
-	     //  		//var tmp = response.data;
-	     //  		//this.info = tmp.filter(data => data.name.includes('a'))
-	     //  		this.info = response.data;
-	     //  	})
+	    	axios
+	      	.get('https://restcountries.eu/rest/v2/all')
+	      	.then(response => {
+	      		this.info = response.data;
+	      	})
 	  	},
 		methods: {
 			ASC: function (event) {
 			    	axios
 			      	.get('https://restcountries.eu/rest/v2/all')
 			      	.then(response => {
-			      		this.info = response.data;
+			      			this.info = response.data.sort();
 			      	})
 		  	},
 		  	DESC: function (event) {
 			    	axios
 			      	.get('https://restcountries.eu/rest/v2/all')
 			      	.then(response => {
-			      		this.info = null;
+			      		this.info = response.data.reverse();
 			      	})
 		  	},
 		  	Filter: function (event) {
