@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
 	<title></title>
@@ -10,9 +10,9 @@
 				delimiters: ['${', '}'],
 				data: {
 					list: [
-				  			{ id: '1', name: 'a' },
-							{ id: '2', name: 'b' },
-						  	{ id: '3', name: 'c' }
+				  			{ id: '123456789', name: '選項 1' },
+							{ id: '234567890', name: '選項 2' },
+						  	{ id: '345678901', name: '選項 3' }
 					],
 				},
 			});
@@ -28,4 +28,34 @@
   		</ul>
 	</div>
 </body>
+</html> -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title></title>
+	<script src="https://unpkg.com/vue/dist/vue.min.js"></script>
+	<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+<body>
+	<div id="app">
+		{{info}}
+	</div>
+	
+	
+</body>
+<script>
+	new Vue({
+	  	el: '#app',
+	  	data () {
+	    	return {
+	      		info: null
+	    	}
+	  	},
+	  	mounted () {
+	    	axios
+	      	.get('https://restcountries.eu/rest/v2/all')
+	      	.then(response => (this.info = response))
+	  	}
+	})
+</script>
 </html>
