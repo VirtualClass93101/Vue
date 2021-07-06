@@ -1,37 +1,85 @@
-## Welcome to GitHub Pages
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title></title>
+	<script src="https://unpkg.com/vue/dist/vue.min.js"></script>
+	<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+<body>
+	
+  	<div id="app">
+  		<input id="search_bar" v-model="Filter_Word" @change="Filter" type="text" placeholder="input...">
+  		<button v-on:click="ASC">正序</button>
+  		<button v-on:click="DESC">倒序</button>
 
-You can use the [editor on GitHub](https://github.com/VirtualClass93101/Vue/edit/main/README.md) to maintain and preview the content for your website in Markdown files.
+  		<table>
+  			<thead>
+		        <tr>
+		            <th>國旗</th>
+		            <th>國家名稱</th>
+		            <th>2位國家代碼</th>
+		            <th>3位國家代碼</th>
+		            <th>母語名稱</th>
+		            <th>替代國家名稱</th>
+		            <th>國際電話區號</th>
+		        </tr>
+			</thead>
+  			<tr v-for="data in info">
+  				<td><img :src="data.flag" style="max-height: 20px;max-width: 40px"></td>
+  				<td>{{data.name}}</td>
+  				<td>{{data.alpha2Code}}</td>
+  				<td>{{data.alpha3Code}}</td>
+  				<td>{{data.nativeName}}</td>
+  				<td>{{data.altSpellings}}</td>
+  				<td>{{data.callingCodes}}</td>
+  			</tr>
+  			
+  		</table>
+  	</div>
+  	
+</body>
+<script>
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+	new Vue({
+	  	el: '#app',
+	  	data () {
+	    	return {
+	      		info: null,
+	      		Filter_Word: ""
+	    	}
+	  	},
+	  	mounted () {
+	    	axios
+	      	.get('https://restcountries.eu/rest/v2/all')
+	      	.then(response => {
+	      		this.info = response.data;
+	      	})
+	  	},
+		methods: {
+			ASC: function (event) {
+			    	axios
+			      	.get('https://restcountries.eu/rest/v2/all')
+			      	.then(response => {
+			      			this.info = response.data.sort();
+			      	})
+		  	},
+		  	DESC: function (event) {
+			    	axios
+			      	.get('https://restcountries.eu/rest/v2/all')
+			      	.then(response => {
+			      		this.info = response.data.reverse();
+			      	})
+		  	},
+		  	Filter: function (event) {
+			    	axios
+			      	.get('https://restcountries.eu/rest/v2/all')
+			      	.then(response => {
+			      		var tmp = response.data;
+			      		this.info = tmp.filter(data => data.name.includes(this.Filter_Word))
+			      	})
+		  	}
+		}
 
-### Markdown
-
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
-
-```markdown
-Syntax highlighted code block
-
-# Header 1
-## Header 2
-### Header 3
-
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
-```
-
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/VirtualClass93101/Vue/settings/pages). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+	})
+</script>
+</html>
