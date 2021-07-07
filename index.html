@@ -2,16 +2,112 @@
 <html lang="en">
 <head>
 	<title></title>
+	<style type="text/css">
+		.modal-mask {
+			position: fixed;
+			z-index: 9998;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background-color: rgba(0, 0, 0, 0.5);
+			display: table;
+			transition: opacity 0.3s ease;
+		}
+
+		.modal-wrapper {
+			display: table-cell;
+			vertical-align: middle;
+		}
+
+		.modal-container {
+			width: 300px;
+			margin: 0px auto;
+			padding: 20px 30px;
+			background-color: #fff;
+			border-radius: 2px;
+			box-shadow: 0 2px 8px rgba(0, 0, 0, 0.33);
+			transition: all 0.3s ease;
+			font-family: Helvetica, Arial, sans-serif;
+		}
+
+		.modal-header h3 {
+			margin-top: 0;
+			color: #42b983;
+		}
+
+		.modal-body {
+			margin: 20px 0;
+		}
+
+		.modal-default-button {
+			float: right;
+		}
+
+		.modal-enter {
+			opacity: 0;
+		}
+
+		.modal-leave-active {
+			opacity: 0;
+		}
+
+		.modal-enter .modal-container,
+		.modal-leave-active .modal-container {
+  			-webkit-transform: scale(1.1);
+  			transform: scale(1.1);
+		}
+		.pagination {
+		  	display: inline-block;
+		}
+
+		.pagination li {
+			color: black;
+			float: left;
+			text-decoration: none;
+			list-style:none;
+		}
+
+	</style>
+
 	<script src="https://unpkg.com/vue/dist/vue.min.js"></script>
 	<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+	<!-- <script type="text/x-template" id="modal-template">
+		
+                
+        
+	</script> -->
+
 </head>
 <body>
 	
   	<div id="app">
-  		<input id="search_bar" v-model="Filter_Word" @change="Filter" type="text" placeholder="input...">
+  		<input id="search_bar" v-model="searchWorld" @change="Filter" type="text" placeholder="input...">
   		<button v-on:click="ASC">正序</button>
   		<button v-on:click="DESC">倒序</button>
-
+  		<h1>total:{{total}}</h1>
+  		<ul v-for="k in totalPage" class="pagination">
+  			<li><button @click="pageClick(k)">{{k}}</button></li>
+  		</ul>
+  		<modal v-if="showModal" @close="showModal = false">
+  			<div class="modal-mask">
+  				<div class="modal-mask">
+          			<div class="modal-wrapper">
+            			<div class="modal-container">
+            				<h1>{{modalText.name}}</h1>
+  							<ul>
+  								<li>Domain:{{modalText.topLevelDomain}}</li>
+  								<li>首都:{{modalText.capital}}</li>
+  								<li>洲別:{{modalText.region}}</li>
+  								<li>亞區:{{modalText.subregion}}</li>
+  								<li>人口:{{modalText.population}}</li>
+  							</ul>
+  							<button  @click="showModal = false">關閉</button>
+        				</div>
+        			</div>
+    			</div>
+			</div>
+  		</modal>
   		<table>
   			<thead>
 		        <tr>
@@ -22,6 +118,7 @@
 		            <th>母語名稱</th>
 		            <th>替代國家名稱</th>
 		            <th>國際電話區號</th>
+		            <th>詳細資訊</th>
 		        </tr>
 			</thead>
   			<tr v-for="data in info">
@@ -32,42 +129,65 @@
   				<td>{{data.nativeName}}</td>
   				<td>{{data.altSpellings}}</td>
   				<td>{{data.callingCodes}}</td>
+  				<td><button @click="modalClick(data)">detail</button></td>
   			</tr>
-  			 
+  			
   		</table>
-  	</div>
-  	
 </body>
 <script>
-
+	// Vue.component("modal", {
+ //        template: "#modal-template"
+ //    });
+ 	var order = 0;
 	new Vue({
 	  	el: '#app',
 	  	data () {
 	    	return {
 	      		info: null,
-	      		Filter_Word: ""
+	      		searchWorld: "",
+	      		showModal: false,
+	      		modalText:"",
+	      		total:0,
+	      		totalPage:0,
+	      		perPage:25,
+	      		pageNow:1
 	    	}
 	  	},
 	  	mounted () {
 	    	axios
 	      	.get('https://restcountries.eu/rest/v2/all')
 	      	.then(response => {
-	      		this.info = response.data;
+	      		this.total = Object.keys(response.data).length;
+	      		if(this.total<25)
+	      			this.info = response.data.slice(0,this.total);
+	      		else
+	      			this.info = response.data.slice(0,25);
+	      		this.totalPage = this.total/this.perPage;
 	      	})
 	  	},
 		methods: {
 			ASC: function (event) {
+					order = 0;
 			    	axios
 			      	.get('https://restcountries.eu/rest/v2/all')
 			      	.then(response => {
-			      			this.info = response.data.sort();
+		      			this.info = response.data.sort();
+		      			if(this.total<this.perPage)
+			      			this.info = response.data.slice(0,this.total);
+			      		else
+			      			this.info = response.data.slice(0,this.perPage)
 			      	})
 		  	},
 		  	DESC: function (event) {
+		  			order = 1;
 			    	axios
 			      	.get('https://restcountries.eu/rest/v2/all')
 			      	.then(response => {
 			      		this.info = response.data.reverse();
+			      		if(this.total<this.perPage)
+				      		this.info = response.data.slice(0,this.total);
+				      	else
+				      		this.info = response.data.slice(0,this.perPage)
 			      	})
 		  	},
 		  	Filter: function (event) {
@@ -75,11 +195,32 @@
 			      	.get('https://restcountries.eu/rest/v2/all')
 			      	.then(response => {
 			      		var tmp = response.data;
-			      		this.info = tmp.filter(data => data.name.includes(this.Filter_Word))
+			      		this.info = tmp.filter(data => data.name.includes(this.searchWorld))
+			      		this.total = Object.keys(this.info).length;
 			      	})
+		  	},
+		  	modalClick: function (event) {
+		  			this.showModal = true;
+		  			this.modalText = event;
+		  	},
+		  	pageClick: function(page) {
+		  		axios
+		      	.get('https://restcountries.eu/rest/v2/all')
+		      	.then(response => {
+		      		
+		      		if(order==0){
+		      			this.info = response.data.sort();
+			      		this.info = this.info.slice((page-1)*25,page*25)
+		      		}
+			      	else{
+			      		this.info = response.data.reverse();
+			      		this.info = this.info.slice((page-1)*25,page*25)
+			      	}
+		      	})
+		  		
 		  	}
 		}
 
 	})
 </script>
-</html> 
+</html>
